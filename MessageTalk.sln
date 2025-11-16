@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageTalk", "MessageTalk\MessageTalk.csproj", "{00B6BACE-CAAF-40F3-AF9D-22492AAB933C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFor", "TestFor\TestFor.csproj", "{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00B6BACE-CAAF-40F3-AF9D-22492AAB933C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00B6BACE-CAAF-40F3-AF9D-22492AAB933C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00B6BACE-CAAF-40F3-AF9D-22492AAB933C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00B6BACE-CAAF-40F3-AF9D-22492AAB933C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8B12816-EEBB-4615-B069-FA864AC82C87}
+	EndGlobalSection
+EndGlobal
