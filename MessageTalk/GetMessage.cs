@@ -1,7 +1,10 @@
-﻿using RestSharp;
+﻿using KCNLanzouDirectLink;
+using RestSharp;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using static MessageTalk.LanZouYun;
 namespace MessageTalk
 {
     public class All
@@ -25,16 +28,16 @@ namespace MessageTalk
             }
             else
             {
-                if(bilijct==null && sessdata != null)
+                if (bilijct == null && sessdata != null)
                 {
                     throw new Exception("bili_jct==null");
                 }
-                else if(bilijct==null && sessdata == null)
+                else if (bilijct == null && sessdata == null)
                 {
                     throw new Exception("sessdata==null;bili_jct==null");
 
                 }
-                else if(bilijct!=null  && sessdata == null)
+                else if (bilijct != null && sessdata == null)
                 {
                     throw new Exception("sessdata==null");
                 }//防止bug
@@ -69,7 +72,7 @@ namespace MessageTalk
         public GetMessage(string bilijct, string sessdata)
         {
             All.bilijct = bilijct;
-            GetMessage.sessdata = sessdata;
+            All.sessdata = sessdata;
         }
         public List<string> GetMessages(string uid)
         {
@@ -92,118 +95,185 @@ namespace MessageTalk
             }
             return Message;
         }
-        void Client()
-        {
-            Dictionary<string, string> datas = new Dictionary<string, string>() { };
-            var bili = new GetMessage("5938330e5c560726c5431c77852555bf", "2cd3ac70%2C1778502984%2Ca38a8%2Ab2CjCdxtaMeFINy5E6pIXkLu_yEbRotv1dtGu--FzrXmD-lJ_yutHOUh7zhPXx0dOrcXsSVkh5Qy1PaXdqM2xDMDVKTVJocjVBOFp2Wjh0Z0R6R05DWXN4dkF5ZHlLcnFPaXlLOXlpUlhTNkljaVVBMXhHNkd2UlNUYmZONmJ6RVYxTy14UXBCRGFnIIEC");
-            var Datas = bili.GetMessages("604524574");
-
-            foreach (var Data in Datas)
-            {
-                string text = "";
-                int i = 0;
-                for (i = 0; i < Data.Length; i++)
-                {
-                    if (Data[i] == 'n' || Data[i] == '&')// 1 n 2 3 4
-                    {
-                        text = Data.Substring(i, Data.Length);
-                        break;
-                    }
-                }
-                int Mathid = i;
-                var IDS = text.Split(';');
-                foreach (var ID in IDS)//获取数据
-                {
-                    var DataIDs = ID.Split(',');
-                    var Name = DataIDs[0];
-                    var Urls = DataIDs[1];
-                    var Password = DataIDs[2];
-                    datas.Add(Name, Urls + "," + Password);
-                }
-                foreach (var Name in datas.Keys)
-                {
-                    //待测试...
-
-                }
-                Mathid = Mathid - 1;
-                if (Mathid == 0)
-                {
-                    break;
-                }
-            }
-        }
     }
     public class ServerFunctions : All
     {
+        public ServerFunctions(string bilijct, string sessdata)
+        {
+            All.bilijct = bilijct;
+            All.sessdata = sessdata;
+        }
+
         public string SendArticle(string text)
         {
-            Dictionary<string, string> Part = new Dictionary<string, string>() 
-            {
-                ["dynamic_id"] = "0",
-                ["type"]="4",
-                ["rid"]="0",
-                ["content"] =text,
-            };
-            Settings(Method.Get, $"https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/create",Part);
-
-            var Json = JsonDocument.Parse(Client.Execute(Request).Content.ToString()).RootElement;
-            if (Json.GetProperty("message").ToString() != "") 
-            {
-                throw new Exception("CookieError");
-            }
-            return Json.GetProperty("data").GetProperty("dynamic_id").ToString();
+            var client = new RestClient("https://api.vc.bilibili.com");
+            var req = new RestRequest("/dynamic_svr/v1/dynamic_svr/create", Method.Post);
+            req.AddParameter("dynamic_id", "0");
+            req.AddParameter("type", "4");
+            req.AddParameter("rid", "0");
+            req.AddParameter("content", text);
+            req.AddCookie("bili_jct", "144d8159fe6c7147fab2c60ffea00a39", "/", ".bilibili.com");
+            req.AddCookie("SESSDATA", "501d50f3%2C1778774000%2C6dbb0%2Ab2CjBGB9J5WodbrggCPd1neWcEl0Pi1jcIxYktJNrY8zvPMDy1gl2waidrx_Sk-5smLbISVjQxTFN2YW8ycHhxYXU2WWF4VHM0TU8wWTNEeVI2NVgtZnp1MkFnam1VSldaZ2h3QmxsQS1ZRWtLWUk0ODRlZmctMDhNZlZIQjIyMElka0pFMndoNzdnIIEC", "/", ".bilibili.com");
+            req.AddParameter("csrf_token", All.bilijct);
+            req.AddParameter("csrf", All.bilijct);
+            return client.Execute(req).Content.ToString();
         }
-        void Servers()//待测试
+
+    }
+    public class LanZouYun
+    {
+        public Byte[] LanZouYUnJX(string ID)
         {
-            var biliServer = new ServerFunctions();
-            string[] FilePath = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\", "*.txt");
-            Dictionary<string, string> Temp = new Dictionary<string, string>() { };
-            List<string> TempTimes = new List<string>() { };
-            Dictionary<string, string> TempTimesDictionary = new Dictionary<string, string>() { };
-            foreach (var time in FilePath)
+            byte[] bytefile = null;
+            string data = "";
+            var Client = new RestClient("https://wwxa.lanzouu.com");
+            var Req = new RestRequest("/"+ID, Method.Get);
+            string html = "";
+            Req.AddHeader("Referer", "https://wwxa.lanzouu.com/"+ID);
+            Req.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0");
+            Req.AddHeader("Accept", "application/json, text/javascript, */*");
+            html = Client.Execute(Req).Content.ToString();
+            foreach (var test in html.Split('\n'))
             {
-                var math = time.Split(')');// ")" 为集     示例:6)炮打资产阶级
-                TempTimes.Add(math[0]);
-                TempTimesDictionary.Add(math[0], math[1]);
-            }
-            TempTimes.Sort();//从小到底大
-            TempTimes.Reverse();//开始从最新的开始
-            foreach (var time in TempTimes)
-            {
-                var Name = Path.GetFileName(TempTimesDictionary[time]);
-                var data = File.ReadAllText(TempTimesDictionary[time]);//http ;114514
-                var url = data.Split(';')[0];//https:  www     .com
-                var password = data.Split(";")[1];//114514
-                Temp.Add(biliServer.AesAdd(Name), url + ";" + password);//开始添加   
-            }
-            string TempText = "";
-            int i = 0;//用于计数
-            foreach (var informations in Temp)
-            {
-                var url = informations.Value.Split(';')[0];//http fddsfsd.com
-                var password = informations.Value.Split(';')[1];//114514
-                if (TempText.Length + (informations.Key + "," + url + "," + password + ";").Length < 1000)//当小于时
+                if (test.IndexOf("src") != -1)
                 {
-                    TempText = TempText + informations.Key + "," + url + "," + password + ";";
-
-                }
-                else if (TempText.Length + (informations.Key + "," + url + "," + password + ";").Length > 1000)//当大于时
-                {
-                    i = i + 1;
-                    biliServer.SendArticle(i + "&" + TempText);
-                    TempText = "";
-                    TempText = informations.Key + "," + url + "," + password + ";";
+                    data = Regex.Split(test, "src")[1].Replace("frameborder=\"0\" scrolling=\"no\"></iframe>", "").Split('/')[1].Replace("\"", "");
+                    if (data.IndexOf("fn") == -1)
+                    {
+                        continue;
+                    }
+                    break;
                 }
             }
-            if (TempText != "")
+            Req = new RestRequest($"/{data}", Method.Get);
+            Req.AddHeader("Referer", "https://wwxa.lanzouu.com/"+ID);
+            Req.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0");
+            Req.AddHeader("Accept", "application/json, text/javascript, */*");
+            //MessageBox.Show(Client.Execute(Req).Content.ToString());
+            string file = "";
+            string ty = "";
+            string sign = "";
+            html = Client.Execute(Req).Content.ToString();
+            foreach (var test in html.Split('\n'))
             {
-                i = i + 1;
-                biliServer.SendArticle(i + "n" + TempText);
-                TempText = "";//结束
+                if (test.IndexOf("url : '/ajaxm.php?file=") != -1 && test.IndexOf("',//data///////") != -1)
+                {
+                    file = test.Split('=')[1].Split('\'')[0];
+                    //break;
+                }
+                if (test.IndexOf("var wp_sign") != -1)
+                {
+                    sign = test.Split('=')[1].Replace("\'", "").Replace(";", "");
+                }
+                if (test.IndexOf("data : { 'action':'") != -1)
+                {
+                    foreach (var tos in test.Replace("data : { '", "").Split(','))
+                    {
+                        if (tos.Replace("\'", "").Replace(":", "=").Replace("}", "").Replace("//", "").Replace("/", "").Trim() == "")
+                        {
+                            continue;
+                        }
+                        if (tos.IndexOf("//'ves':1 }") != -1)
+                        {
+                            continue;
+                        }
+                        if (ty == "")
+                        {
+                            ty = tos.Replace("\'", "").Replace(":", "=").Replace("}", "").Replace("//", "").Replace("/", "");
+
+                        }
+                        else
+                        {
+                            if (tos.IndexOf("sign") == -1)
+                            {
+                                ty = ty + "&" + tos.Replace("\'", "").Replace(":", "=").Replace("}", "").Replace("//", "").Replace("/", "");
+
+                            }
+                            else
+                            {
+                                if (tos.IndexOf("websign") == -1 && tos.IndexOf("wp_sign") == -1)
+                                {
+                                    ty = ty + "&" + "sign=" + sign;
+                                }
+                                else
+                                {
+                                    ty = ty + "&" + tos.Replace("\'", "").Replace(":", "=").Replace("}", "").Replace("//", "").Replace("/", "");
+
+                                }
+
+                            }
+
+                        }
+                    }
+                    ty = ty.Trim();
+                }
             }
 
+            string[] funclist = { "action", "websignkey", "sign", "websign", "kd", "ves" };
+            Dictionary<string, string> func = new Dictionary<string, string>()
+            {
+                ["action"] = "",
+                ["websignkey"] = "",
+                ["sign"] = "",
+                ["websign"] = "",
+                ["kd"] = "",
+                ["ves"] = ""
+            };
+            foreach (string t in ty.Split('&'))
+            {
+                var tp = t.Split('=');
+                if (tp[1] == "wp_sign")
+                {
+                    continue;
+                }
+                foreach (var key in funclist)
+                {
+
+                    if (func.ContainsKey(tp[0]))
+                    {
+                        func[tp[0]] = tp[1];
+                        break;
+                    }
+                }
+            }
+            var postData = new
+            {
+                action = func["action"],
+                websignkey = func["websignkey"],
+                sign = func["sign"],
+                websign = func["websign"],
+                kd = func["action"],
+                ves = func["action"]
+            };
+            Client = new RestClient("https://wwxa.lanzouu.com");
+            Req = new RestRequest($"/ajaxm.php?file={file} ", Method.Post);
+            Req.AddObject(postData);
+            Req.AddHeader("Referer", "https://wwxa.lanzouu.com/" + data);
+            data = Client.Execute(Req).Content.ToString();
+            data = JsonDocument.Parse(Client.Execute(Req).Content.ToString()).RootElement.GetProperty("url").ToString();
+            var options = new RestClientOptions("https://developer-oss.lanrar.com")
+            {
+                FollowRedirects = false  // 关键：禁用自动重定向
+            };
+
+            Client = new RestClient(options);
+            Req = new RestRequest("/file/" + data, Method.Get);
+            Req.AddHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+            var headersData = Client.Execute(Req).Headers;
+            foreach (var header in headersData)
+            {
+                if (header.ToString().IndexOf("Location") != -1)
+                {
+                    data = header.ToString().Replace(header.ToString().Split('=')[0], "");
+                    data = data.Substring(1, data.Length - 1);
+                    break;
+                }
+            }
+            Client = new RestClient(data);
+            Req = new RestRequest("", Method.Get);
+            bytefile = Client.Execute(Req).RawBytes;
+            return bytefile;
         }
     }
-    
 }
 
