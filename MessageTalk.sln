@@ -5,7 +5,9 @@ VisualStudioVersion = 17.14.36603.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageTalk", "MessageTalk\MessageTalk.csproj", "{00B6BACE-CAAF-40F3-AF9D-22492AAB933C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFor", "TestFor\TestFor.csproj", "{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageTalkPC", "TestFor\MessageTalkPC.csproj", "{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{BD18873F-BEC2-49C0-85B2-F274EAEFC167}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1040B9AE-0D67-4490-AC91-6A5F864C2CF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD18873F-BEC2-49C0-85B2-F274EAEFC167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD18873F-BEC2-49C0-85B2-F274EAEFC167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD18873F-BEC2-49C0-85B2-F274EAEFC167}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD18873F-BEC2-49C0-85B2-F274EAEFC167}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

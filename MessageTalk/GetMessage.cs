@@ -1,5 +1,6 @@
 ﻿using KCNLanzouDirectLink;
 using RestSharp;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -73,6 +74,19 @@ namespace MessageTalk
         {
             All.bilijct = bilijct;
             All.sessdata = sessdata;
+        }
+        public bool iflogin()
+        {
+            var Client = new RestClient("https://api.bilibili.com");
+            Settings(Method.Get, "/x/web-interface/nav");
+            if (Client.Execute(Request).Content.IndexOf("-101") == -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public List<string> GetMessages(string uid)
         {

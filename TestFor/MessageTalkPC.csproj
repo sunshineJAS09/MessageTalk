@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StartupObject>TestFor.Program</StartupObject>
+    <AssemblyName>MessageTalkPC</AssemblyName>
+    <RootNamespace>MessageTalkPC</RootNamespace>
+    <ApplicationIcon>QQ20251006-171438.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="QQ20251006-171438.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3650-prerelease" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MessageTalk\MessageTalk.csproj" />
+  </ItemGroup>
+
+</Project>

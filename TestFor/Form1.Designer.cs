@@ -28,7 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             listBox1 = new ListBox();
+            timer1 = new System.Windows.Forms.Timer(components);
             button1 = new Button();
             SuspendLayout();
             // 
@@ -37,29 +40,38 @@
             listBox1.FormattingEnabled = true;
             listBox1.Location = new Point(1, 3);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(249, 446);
+            listBox1.Size = new Size(249, 429);
             listBox1.TabIndex = 0;
             listBox1.SelectedValueChanged += listBox1_SelectedValueChanged;
             // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 1000;
+            timer1.Tick += timer1_Tick;
+            // 
             // button1
             // 
-            button1.Location = new Point(256, 27);
+            button1.Location = new Point(12, 445);
             button1.Name = "button1";
-            button1.Size = new Size(75, 23);
+            button1.Size = new Size(261, 33);
             button1.TabIndex = 1;
-            button1.Text = "button1";
+            button1.Text = "出现问题?尝试点我清理缓存";
             button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click_1;
+            button1.Click += button1_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(274, 481);
             Controls.Add(button1);
             Controls.Add(listBox1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximumSize = new Size(290, 520);
+            MinimumSize = new Size(290, 520);
             Name = "Form1";
-            Text = "Form1";
+            Text = "MessageTalk";
             Load += Form1_Load;
             ResumeLayout(false);
         }
@@ -67,6 +79,7 @@
         #endregion
 
         private ListBox listBox1;
+        private System.Windows.Forms.Timer timer1;
         private Button button1;
     }
 }

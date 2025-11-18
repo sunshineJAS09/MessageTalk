@@ -1,122 +1,86 @@
+using Ionic.Zip;
 using MessageTalk;
-using RestSharp;
 using System.Diagnostics;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace TestFor
 {
     public partial class Form1 : Form
     {
-        string bilijct = "144d8159fe6c7147fab2c60ffea00a39";
-        string sessdata = "501d50f3%2C1778774000%2C6dbb0%2Ab2CjBGB9J5WodbrggCPd1neWcEl0Pi1jcIxYktJNrY8zvPMDy1gl2waidrx_Sk-5smLbISVjQxTFN2YW8ycHhxYXU2WWF4VHM0TU8wWTNEeVI2NVgtZnp1MkFnam1VSldaZ2h3QmxsQS1ZRWtLWUk0ODRlZmctMDhNZlZIQjIyMElka0pFMndoNzdnIIEC";
-        string uid = "604524574";
+        Form2 login = new Form2();
+        string bilijct = "";
+        string sessdata = "";
+        string uid = "604524574";//这只是为了测试
         Dictionary<string, string> datas = new Dictionary<string, string>() { };
         public Form1()
         {
             InitializeComponent();
-            
-        }
-
-
-        void Servers()
-        {
-            if (!Directory.Exists(Directory.GetCurrentDirectory() + "\\Pages"))
-            {
-                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Pages");
-            }
-            var biliServer = new ServerFunctions(bilijct, sessdata);
-            string[] FilePath = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Pages", "*.txt");
-            Dictionary<string, string> Temp = new Dictionary<string, string>() { };
-            List<string> TempTimes = new List<string>() { };
-            Dictionary<string, string> TempTimesDictionary = new Dictionary<string, string>() { };
-            foreach (var time in FilePath)
-            {
-                var math = Path.GetFileName(time).Replace(".txt", "").Split(')');// ")" 为集     示例:6)炮打资产阶级
-                TempTimes.Add(math[0]);
-                TempTimesDictionary.Add(math[0], time);
-            }
-            TempTimes.Sort();//从小到底大
-            TempTimes.Reverse();//开始从最新的开始
-            foreach (var time in TempTimes)
-            {
-                var Name = Path.GetFileName(TempTimesDictionary[time].Replace(".txt", ""));
-                var data = File.ReadAllText(TempTimesDictionary[time]).Split('/')[File.ReadAllText(TempTimesDictionary[time]).Split('/').Length - 1];//http ;114514
-                var url = data.Split(';')[0];//https:  www     .com
-                var password = data.Split(";")[1];//114514
-                Temp.Add(biliServer.AesAdd(Name), url + ";" + password);//开始添加   
-            }
-            string TempText = "";
-            int i = 0;//用于计数
-            foreach (var informations in Temp)
-            {
-                var url = informations.Value.Split(';')[0];//http fddsfsd.com
-                var password = informations.Value.Split(';')[1];//114514
-                if (TempText.Length + (informations.Key + "," + url + "," + password + ";").Length < 1000)//当小于时
-                {
-                    TempText = TempText + informations.Key + "," + url + "," + password + ";";
-
-                }
-                else if (TempText.Length + (informations.Key + "," + url + "," + password + ";").Length > 1000)//当大于时
-                {
-                    i = i + 1;
-                    biliServer.SendArticle(i + "&" + TempText);
-                    TempText = "";
-                    TempText = informations.Key + "," + url + "," + password + ";";
-                }
-            }
-            if (TempText != "")
-            {
-                i = i + 1;
-                biliServer.SendArticle(i + "n" + TempText);
-                TempText = "";//结束
-            }
 
         }
+        int Count = 0;
+
+
         void Client()
         {
 
+            datas.Clear();
+            listBox1.Items.Clear();
             var bili = new GetMessage(bilijct, sessdata);
             var Datas = bili.GetMessages(uid);
-
-            foreach (var Data in Datas)
+            int i = 0;
+            string text = "";
+            for (i = 0; i < Datas[0].Length; i++)//获取多少长度
             {
-                string text = "";
-                int i = 0;
-                for (i = 0; i < Data.Length; i++)
+                if (Datas[0][i] == 'n' || Datas[0][i] == '&')// 1 n 2 3 4
                 {
-                    if (Data[i] == 'n' || Data[i] == '&')// 1 n 2 3 4
+                    text = Datas[0].Substring(i + 1, Datas[0].Length - i - 1);
+                    break;
+                }
+            }
+            int Mathid = i;
+            foreach (var Datass in Datas)
+            {
+                for (int y = 0; y < Datass.Length; y++)//获取多少长度
+                {
+                    if (Datass[y] == 'n' || Datass[y] == '&')// 1 n 2 3 4
                     {
-                        text = Data.Substring(i + 1, Data.Length - i - 1);
+                        text = Datass.Substring(y + 1, Datass.Length - y - 1);
                         break;
                     }
-                }
-                int Mathid = i;
-                var IDS = text.Split(',');
+                }//取原始文本
+                text = text.Substring(0, text.Length - 1);//去除;
 
-                var Name = IDS[0];
-                var Urls = IDS[1];
-                string result = bili.AesRemove(Name);
-                for (int y = 0;y<result.Length;y++)
+                foreach (var s in text.Split(';'))
                 {
-                    char word = result[y];
-                    if (word == ')')
+                    var IDS = s.Split(',');
+                    var Name = IDS[0];
+                    var Urls = IDS[1];
+                    string result = bili.AesRemove(Name);
+                    for (int y = 0; y < result.Length; y++)
                     {
-                        result = result.Substring(y+1,result.Length-y-1);
-                        break;
+                        char word = result[y];
+                        if (word == ')')
+                        {
+                            result = result.Substring(y + 1, result.Length - y - 1);
+                            break;
+                        }
                     }
-                }
-                datas.Add(result, Urls);
+                    datas.Add(result, Urls);
 
-                foreach (var Names in datas.Keys)
-                {
-                    listBox1.Items.Add(Names);
+
+                    listBox1.Items.Add(result);
+
+
+
                 }
-                Mathid = Mathid - 1;
+                Mathid = Mathid - 1;//一次次来
                 if (Mathid == 0)
                 {
                     break;
                 }
+
+
+
             }
         }
 
@@ -125,25 +89,107 @@ namespace TestFor
 
         private async void listBox1_SelectedValueChanged(object sender, EventArgs e)
         {
+            if (Directory.Exists(Directory.GetCurrentDirectory() + "\\Message") == false)
+            {
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Message");
+            }
             var LanZouYun = new LanZouYun();
-            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf", LanZouYun.LanZouYUnJX(datas[listBox1.SelectedItem.ToString()]));
-            //File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf", LanZouYun.LanZouYUnJX(listBox1.SelectedItem.ToString()));
+            if (!File.Exists(Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString() + ".pdf"))
+            {
+                File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString() + ".zip", LanZouYun.LanZouYUnJX(datas[listBox1.SelectedItem.ToString()]));
+                var zip = ZipFile.Read(Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString() + ".zip");
+                zip.Password = "mlmws";
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString());
+                zip.ExtractAll(Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString(), ExtractExistingFileAction.OverwriteSilently);
+                string[] file = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString(),"*.pdf");
+                File.Move(file[0], Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString() + ".pdf");
+                File.Delete(file[0]);
+                Directory.Delete(Directory.GetCurrentDirectory()+"\\"+"Message"+"\\"+ listBox1.SelectedItem.ToString());
+            }
             Process.Start(new ProcessStartInfo
             {
-                FileName = Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf",
+                FileName = Directory.GetCurrentDirectory() + "\\" + "Message" + "\\" + listBox1.SelectedItem.ToString() + ".pdf",
                 UseShellExecute = true
-            });//暂时测试
+            });
+
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //button1.Visible = false;
-            Client();
-        }
+            string[] deletefile = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Message", "*.zip");
+            foreach (var file in deletefile)
+            {
+                File.Delete(file);//日常清理缓存
+            }
+            timer1.Interval = 1000;
+            if (File.Exists(Directory.GetCurrentDirectory() + "\\Cookies") == false)
+            {
+                login.ShowDialog();
+            }
+            else
+            {
+                Start();
+            }
 
+        }
+        private void Start()
+        {
+            Count = 1;
+            timer1.Interval = 60000;
+            var Data = File.ReadAllText(Directory.GetCurrentDirectory() + "\\Cookies").Split(';');
+            foreach (var cookie in Data)
+            {
+                if (cookie.IndexOf("bili_jct") != -1)
+                {
+                    bilijct = cookie.Replace("bili_jct=", "");
+                }
+                else if (cookie.IndexOf("SESSDATA") != -1)
+                {
+                    sessdata = cookie.Replace("SESSDATA=", "");
+                }
+            }
+            if (new GetMessage(bilijct, sessdata).iflogin() == false)
+            {
+                login.ShowDialog();
+            }
+            if (bilijct == "" || sessdata == "")
+            {
+                MessageBox.Show("出现未知错误");
+                Application.Exit();
+            }
+            Client();
+
+        }
         private void button1_Click_1(object sender, EventArgs e)
         {
-            Servers();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (login.Text == "sucessful")
+            {
+                if (Count == 1)
+                {
+                    Client();
+                }
+                else if (Count == 0)
+                {
+                    login.Close();
+                    Start();
+
+                }
+            }
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string[] deletefile = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Message", "*.zip");
+            foreach (var file in deletefile)
+            {
+                File.Delete(file);//日常清理缓存
+            }
         }
     }
 }
