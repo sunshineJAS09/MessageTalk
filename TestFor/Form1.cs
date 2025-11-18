@@ -8,10 +8,14 @@ namespace TestFor
 {
     public partial class Form1 : Form
     {
+        string bilijct = "144d8159fe6c7147fab2c60ffea00a39";
+        string sessdata = "501d50f3%2C1778774000%2C6dbb0%2Ab2CjBGB9J5WodbrggCPd1neWcEl0Pi1jcIxYktJNrY8zvPMDy1gl2waidrx_Sk-5smLbISVjQxTFN2YW8ycHhxYXU2WWF4VHM0TU8wWTNEeVI2NVgtZnp1MkFnam1VSldaZ2h3QmxsQS1ZRWtLWUk0ODRlZmctMDhNZlZIQjIyMElka0pFMndoNzdnIIEC";
+        string uid = "604524574";
         Dictionary<string, string> datas = new Dictionary<string, string>() { };
         public Form1()
         {
             InitializeComponent();
+            
         }
 
 
@@ -21,7 +25,7 @@ namespace TestFor
             {
                 Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Pages");
             }
-            var biliServer = new ServerFunctions("", "");
+            var biliServer = new ServerFunctions(bilijct, sessdata);
             string[] FilePath = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Pages", "*.txt");
             Dictionary<string, string> Temp = new Dictionary<string, string>() { };
             List<string> TempTimes = new List<string>() { };
@@ -72,8 +76,8 @@ namespace TestFor
         void Client()
         {
 
-            var bili = new GetMessage("", "");
-            var Datas = bili.GetMessages("");
+            var bili = new GetMessage(bilijct, sessdata);
+            var Datas = bili.GetMessages(uid);
 
             foreach (var Data in Datas)
             {
@@ -92,8 +96,17 @@ namespace TestFor
 
                 var Name = IDS[0];
                 var Urls = IDS[1];
-                //var Password = IDS[2];
-                datas.Add(bili.AesRemove(Name), Urls);
+                string result = bili.AesRemove(Name);
+                for (int y = 0;y<result.Length;y++)
+                {
+                    char word = result[y];
+                    if (word == ')')
+                    {
+                        result = result.Substring(y+1,result.Length-y-1);
+                        break;
+                    }
+                }
+                datas.Add(result, Urls);
 
                 foreach (var Names in datas.Keys)
                 {
@@ -107,23 +120,14 @@ namespace TestFor
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            //Servers();
-        }
-
-        private async void button2_Click(object sender, EventArgs e)
-        {
 
 
-        }
 
         private async void listBox1_SelectedValueChanged(object sender, EventArgs e)
         {
             var LanZouYun = new LanZouYun();
-            //File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf", LanZouYun.LanZouYUnJX(datas[listBox1.SelectedItem.ToString()]));
-            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf", LanZouYun.LanZouYUnJX(listBox1.SelectedItem.ToString()));
+            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf", LanZouYun.LanZouYUnJX(datas[listBox1.SelectedItem.ToString()]));
+            //File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf", LanZouYun.LanZouYUnJX(listBox1.SelectedItem.ToString()));
             Process.Start(new ProcessStartInfo
             {
                 FileName = Directory.GetCurrentDirectory() + "\\" + listBox1.SelectedItem.ToString() + ".pdf",
@@ -133,11 +137,13 @@ namespace TestFor
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Client();
+            //button1.Visible = false;
+            Client();
         }
 
         private void button1_Click_1(object sender, EventArgs e)
         {
+            Servers();
         }
     }
 }
